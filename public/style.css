@@ -159,15 +159,19 @@ main { flex: 1; margin-top: -20px; position: relative; z-index: 2; }
 .banner-title h2 { font-family: var(--display); font-weight: 400; font-size: clamp(1.8rem, 4vw, 2.4rem); line-height: 1.1; margin: 0; overflow-wrap: anywhere; }
 .tag { margin: 2px 0 10px; color: var(--muted); font-weight: 700; }
 
-.th-badge {
-  width: 84px; height: 94px; flex: none;
-  display: grid; place-content: center; text-align: center;
-  clip-path: polygon(50% 0, 100% 14%, 100% 64%, 50% 100%, 0 64%, 0 14%);
-  background: linear-gradient(160deg, #ffd25a, #e08a00);
-  color: var(--on-gold); font-family: var(--display); line-height: 1;
+.th-hall { position: relative; width: 104px; height: 104px; flex: none; display: grid; place-items: center; }
+.th-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 8px rgb(0 0 0 / 0.25)); }
+.th-level {
+  position: absolute; right: -4px; bottom: 0;
+  font-family: var(--display); font-size: 1.3rem; line-height: 1;
+  padding: 4px 9px; border-radius: 10px;
+  background: linear-gradient(#ffd25a, #e9a000); color: var(--on-gold);
+  box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.15), 0 2px 6px rgb(0 0 0 / 0.25);
 }
-.th-badge small { font-size: 0.8rem; opacity: 0.8; }
-.th-badge strong { font-size: 2.4rem; font-weight: 400; }
+.th-level small { font-size: 0.65rem; margin-right: 2px; opacity: 0.8; }
+
+.builder-banner .stats { flex: 1; min-width: 240px; grid-template-columns: repeat(2, 1fr); margin: 0; }
+.builder-banner .stat { background: var(--surface-2); box-shadow: none; }
 .clan-badge { width: 96px; height: 96px; flex: none; filter: drop-shadow(0 4px 6px rgb(0 0 0 / 0.2)); }
 
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -216,17 +220,26 @@ main { flex: 1; margin-top: -20px; position: relative; z-index: 2; }
 .ring::after { content: ""; width: 28px; height: 28px; border-radius: 50%; background: var(--surface); grid-area: 1 / 1; }
 .ring span { grid-area: 1 / 1; z-index: 1; font-size: 0.65rem; color: var(--text); }
 
-.unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 8px; }
+.unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
 .unit {
-  background: var(--surface-2); border-radius: 12px; padding: 10px 12px;
-  display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: baseline;
-  border: 1px solid transparent;
+  background: var(--surface-2); border-radius: 12px; padding: 8px 12px 8px 8px;
+  display: flex; align-items: center; gap: 10px;
 }
 .unit.maxed { background: var(--success-soft); }
+.unit-img {
+  position: relative; width: 52px; height: 52px; flex: none;
+  border-radius: 10px; background: var(--surface);
+  display: grid; place-items: center;
+}
+.unit-img::before { content: attr(data-initials); font-family: var(--display); color: var(--muted); font-size: 1.1rem; }
+.unit-img:has(img)::before { content: none; }
+.unit-img img { position: absolute; inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px); object-fit: contain; }
+.unit-info { flex: 1; min-width: 0; display: grid; grid-template-columns: auto 1fr; gap: 0 8px; align-items: center; }
+.unit-info .unit-name { grid-column: 1 / -1; }
 .unit-name { font-size: 0.88rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .unit-level { font-family: var(--display); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
 .unit-level small { color: var(--muted); font-family: "Nunito", sans-serif; font-weight: 700; }
-.bar { grid-column: 1 / -1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+.bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
 .bar span { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--gold-strong), var(--gold)); }
 .unit.maxed .bar span { background: var(--success); }
 
@@ -249,15 +262,18 @@ tr:nth-child(3) .rank { color: #c87a3b; }
 .role { display: inline-block; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; padding: 1px 7px; border-radius: 6px; background: var(--surface-2); color: var(--muted); }
 .role-leader { background: var(--gold); color: var(--on-gold); }
 .role-coLeader { background: var(--gold-soft); color: var(--gold-strong); }
-.th-pill { display: inline-block; min-width: 2.2em; text-align: center; font-family: var(--display); padding: 2px 6px; border-radius: 8px; background: var(--gold-soft); color: var(--gold-strong); }
+.th-mini { width: 22px; height: 22px; object-fit: contain; margin-right: 4px; }
+.th-pill { display: inline-flex; align-items: center; min-width: 2.2em; justify-content: center; font-family: var(--display); padding: 2px 6px; border-radius: 8px; background: var(--gold-soft); color: var(--gold-strong); }
 .trophies { font-family: var(--display); font-size: 1.05rem; }
 
 @media (max-width: 600px) {
   .hide-sm { display: none; }
   .hero h1 { margin-top: 28px; }
   .search-row button { padding: 0 18px; }
-  .th-badge { width: 68px; height: 76px; }
-  .th-badge strong { font-size: 1.9rem; }
+  .th-hall { width: 80px; height: 80px; }
+  .unit-grid { grid-template-columns: 1fr 1fr; }
+  .unit { padding: 6px 8px 6px 6px; gap: 8px; }
+  .unit-img { width: 40px; height: 40px; }
   .clan-badge { width: 72px; height: 72px; }
   .stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .stat { padding: 12px; gap: 10px; }
