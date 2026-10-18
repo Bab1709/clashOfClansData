@@ -31,3 +31,15 @@ python3 -m pip install certifi
 The browser can't call the Clash of Clans API directly: the API doesn't allow it, and the key would be exposed. Instead, `server.py` serves the site and forwards `/api/player/<tag>` and `/api/clan/<tag>` to the API, adding the key on the server side. The key never reaches the browser.
 
 `.env` is in `.gitignore`. Never commit your key.
+
+## Images
+
+The API doesn't include pictures of troops, heroes, spells or equipment. The images in `public/img` come from the open-source [clash-of-clans-data](https://github.com/chiefpansancolt/clash-of-clans-data) project and are shrunk to keep pages fast. When new units come out, refresh them with:
+
+```
+python3 scripts/download_icons.py
+```
+
+The script uses `sips` for resizing, which ships with macOS. If an image is missing, the site shows the unit's initials instead.
+
+Game images belong to Supercell and are used under the [Supercell Fan Content Policy](https://supercell.com/en/fan-content-policy/).

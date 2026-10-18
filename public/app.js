@@ -116,7 +116,22 @@ function labelChips(labels) {
     .join("");
 }
 
-function levelGrid(title, items) {
+// Image files are named after the unit: "P.E.K.K.A" -> "pekka", "Barbarian King" -> "barbarian-king".
+const slug = (name) => name.toLowerCase().replace(/\./g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const initials = (name) => name.replace(/\./g, "").split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+
+function unitImage(folder, name) {
+  // If an image is missing, the img removes itself and the initials underneath show instead.
+  return `<span class="unit-img" data-initials="${esc(initials(name))}">
+    <img src="img/${folder}/${esc(slug(name))}.png" alt="" loading="lazy" onerror="this.remove()">
+  </span>`;
+}
+
+function hallImage(folder, level, cls) {
+  return `<img class="${cls}" src="img/${folder}/${Number(level)}.png" alt="" onerror="this.remove()">`;
+}
+
+function levelGrid(title, items, folder) {
   if (!items || items.length === 0) return "";
   const done = items.reduce((sum, i) => sum + Math.min(i.level, i.maxLevel), 0);
   const total = items.reduce((sum, i) => sum + i.maxLevel, 0);
@@ -128,9 +143,12 @@ function levelGrid(title, items) {
       const maxed = item.level >= item.maxLevel;
       const pct = Math.round((item.level / item.maxLevel) * 100);
       return `<div class="unit${maxed ? " maxed" : ""}" title="${esc(item.name)}: ${item.level}/${item.maxLevel}">
-        <span class="unit-name">${esc(item.name)}</span>
-        <span class="unit-level">${item.level}<small>/${item.maxLevel}</small></span>
-        <span class="bar"><span style="width:${pct}%"></span></span>
+        ${unitImage(folder, item.name)}
+        <span class="unit-info">
+          <span class="unit-name">${esc(item.name)}</span>
+          <span class="unit-level">${item.level}<small>/${item.maxLevel}</small></span>
+          <span class="bar"><span style="width:${pct}%"></span></span>
+        </span>
       </div>`;
     })
     .join("");
@@ -149,7 +167,7 @@ function levelGrid(title, items) {
 function renderPlayer(p) {
   const home = (list) => (list || []).filter((u) => u.village === "home");
   const builder = (list) => (list || []).filter((u) => u.village === "builderBase");
-  const troops = home(p.troops).filter((t) => !t.name.startsWith("Super "));
+  const troops = home(p.troops).filter((t) => !t.name.startsWith("Super ") && !SUPER_TROOPS.has(t.name));
   const pets = troops.filter((t) => PETS.has(t.name));
   const siege = troops.filter((t) => SIEGE.has(t.name));
   const army = troops.filter((t) => !PETS.has(t.name) && !SIEGE.has(t.name));
@@ -164,7 +182,10 @@ function renderPlayer(p) {
   return `
     <article class="profile">
       <div class="banner">
-        <div class="th-badge"><small>TH</small><strong>${p.townHallLevel}</strong></div>
+        <div class="th-hall">
+          ${hallImage("town-hall", p.townHallLevel, "th-img")}
+          <span class="th-level"><small>TH</small>${p.townHallLevel}</span>
+        </div>
         <div class="banner-title">
           <h2>${esc(p.name)}</h2>
           <p class="tag">${esc(p.tag)} · XP level ${p.expLevel}</p>
@@ -184,22 +205,27 @@ function renderPlayer(p) {
         ${stat("castle", "Capital gold", fmt(p.clanCapitalContributions))}
       </div>
 
-      ${levelGrid("Heroes", home(p.heroes))}
-      ${levelGrid("Hero equipment", p.heroEquipment)}
-      ${levelGrid("Pets", pets)}
-      ${levelGrid("Troops", army)}
-      ${levelGrid("Siege machines", siege)}
-      ${levelGrid("Spells", p.spells)}
+      ${levelGrid("Heroes", home(p.heroes), "heroes")}
+      ${levelGrid("Hero equipment", p.heroEquipment, "equipment")}
+      ${levelGrid("Pets", pets, "pets")}
+      ${levelGrid("Troops", army, "troops")}
+      ${levelGrid("Siege machines", siege, "siege")}
+      ${levelGrid("Spells", p.spells, "spells")}
 
       ${p.builderHallLevel ? `
         <h2 class="section-title">Builder base</h2>
-        <div class="stats">
-          ${stat("castle", "Builder hall", p.builderHallLevel)}
-          ${stat("trophy", "Trophies", fmt(p.builderBaseTrophies))}
-          ${stat("trophy", "Best trophies", fmt(p.bestBuilderBaseTrophies))}
+        <div class="banner builder-banner">
+          <div class="th-hall">
+            ${hallImage("builder-hall", p.builderHallLevel, "th-img")}
+            <span class="th-level"><small>BH</small>${p.builderHallLevel}</span>
+          </div>
+          <div class="stats">
+            ${stat("trophy", "Trophies", fmt(p.builderBaseTrophies))}
+            ${stat("trophy", "Best trophies", fmt(p.bestBuilderBaseTrophies))}
+          </div>
         </div>
-        ${levelGrid("Builder heroes", builder(p.heroes))}
-        ${levelGrid("Builder troops", builder(p.troops))}
+        ${levelGrid("Builder heroes", builder(p.heroes), "builder-heroes")}
+        ${levelGrid("Builder troops", builder(p.troops), "builder-troops")}
       ` : ""}
     </article>`;
 }
@@ -219,7 +245,7 @@ function renderClan(c) {
             <div><a href="#player/${esc(cleanTag(m.tag))}">${esc(m.name)}</a><br><span class="role role-${esc(m.role)}">${esc(ROLE_NAMES[m.role] || m.role)}</span></div>
           </div>
         </td>
-        <td class="num"><span class="th-pill">${m.townHallLevel ?? "–"}</span></td>
+        <td class="num"><span class="th-pill">${m.townHallLevel ? hallImage("town-hall", m.townHallLevel, "th-mini") : ""}${m.townHallLevel ?? "–"}</span></td>
         <td class="num trophies">${fmt(m.trophies)}</td>
         <td class="num hide-sm">${fmt(m.donations)}</td>
         <td class="num hide-sm">${fmt(m.donationsReceived)}</td>
@@ -272,12 +298,14 @@ function renderClan(c) {
 
 const PETS = new Set([
   "L.A.S.S.I", "Electro Owl", "Mighty Yak", "Unicorn", "Frosty", "Diggy", "Poison Lizard",
-  "Phoenix", "Spirit Fox", "Angry Jelly", "Sneezy",
+  "Phoenix", "Spirit Fox", "Angry Jelly", "Sneezy", "Greedy Raven",
 ]);
 const SIEGE = new Set([
   "Wall Wrecker", "Battle Blimp", "Stone Slammer", "Siege Barracks", "Log Launcher",
-  "Flame Flinger", "Battle Drill", "Troop Launcher",
+  "Flame Flinger", "Battle Drill", "Troop Launcher", "Sky Wagon",
 ]);
+// Super troops whose names don't start with "Super". They're temporary boosts, not upgrades.
+const SUPER_TROOPS = new Set(["Sneaky Goblin", "Rocket Balloon", "Inferno Dragon", "Ice Hound"]);
 const WAR_FREQUENCY = {
   always: "Always", moreThanOncePerWeek: "Twice a week", oncePerWeek: "Once a week",
   lessThanOncePerWeek: "Rarely", never: "Never", unknown: "Not set",
