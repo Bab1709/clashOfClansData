@@ -4,29 +4,38 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Clash Stats</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;600;700;800&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="site-header">
-    <a href="#" class="logo">Clash<span>Stats</span></a>
-  </header>
+  <header class="hero">
+    <div class="hero-inner">
+      <a href="#" class="logo">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"/></svg>
+        Clash<span>Stats</span>
+      </a>
 
-  <main>
-    <section class="search">
-      <h1>Look up a player or clan</h1>
-      <p class="hint">Enter a tag, like <code>#2PP</code>. You'll find it under the name in the game.</p>
-      <form id="search-form" autocomplete="off">
+      <h1>Look up any player or clan</h1>
+      <p class="hint">Paste a tag from the game, like <code>#2PP</code>. It's shown under every name.</p>
+
+      <form id="search-form" class="search-card" autocomplete="off">
         <div class="toggle" role="radiogroup" aria-label="Search type">
           <label><input type="radio" name="type" value="player" checked> Player</label>
           <label><input type="radio" name="type" value="clan"> Clan</label>
         </div>
         <div class="search-row">
-          <input id="tag-input" type="text" placeholder="#TAG" aria-label="Tag" required>
+          <input id="tag-input" type="text" placeholder="#TAG" aria-label="Tag" spellcheck="false" required>
           <button type="submit">Search</button>
         </div>
       </form>
-    </section>
 
+      <div id="recent" class="recent" hidden></div>
+    </div>
+  </header>
+
+  <main>
     <div id="status" class="status" hidden></div>
     <section id="result"></section>
   </main>
