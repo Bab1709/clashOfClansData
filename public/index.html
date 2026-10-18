@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clash Stats</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a href="#" class="logo">Clash<span>Stats</span></a>
+  </header>
+
+  <main>
+    <section class="search">
+      <h1>Look up a player or clan</h1>
+      <p class="hint">Enter a tag, like <code>#2PP</code>. You'll find it under the name in the game.</p>
+      <form id="search-form" autocomplete="off">
+        <div class="toggle" role="radiogroup" aria-label="Search type">
+          <label><input type="radio" name="type" value="player" checked> Player</label>
+          <label><input type="radio" name="type" value="clan"> Clan</label>
+        </div>
+        <div class="search-row">
+          <input id="tag-input" type="text" placeholder="#TAG" aria-label="Tag" required>
+          <button type="submit">Search</button>
+        </div>
+      </form>
+    </section>
+
+    <div id="status" class="status" hidden></div>
+    <section id="result"></section>
+  </main>
+
+  <footer class="site-footer">
+    Data from the official Clash of Clans API. Not affiliated with or endorsed by Supercell.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
